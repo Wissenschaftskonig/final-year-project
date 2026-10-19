@@ -1,0 +1,1368 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SME Credit Profile Viewer</title>
+    <style>
+      :root {
+        --bg: #f7f8fa;
+        --card: #ffffff;
+        --border: #e5e7eb;
+        --text: #111827;
+        --muted: #6b7280;
+        --faint: #9ca3af;
+        --blue: #2563eb;
+        --blue-soft: #eff6ff;
+        --green: #16a34a;
+        --green-soft: #f0fdf4;
+        --amber: #d97706;
+        --amber-soft: #fffbeb;
+        --red: #dc2626;
+        --red-soft: #fef2f2;
+        --radius: 14px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Arial,
+          sans-serif;
+        background: var(--bg);
+        margin: 0;
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 32px 22px 56px;
+      }
+
+      .page-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+      .page-head .logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      h1 {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 2px 0 0;
+      }
+
+      .toolbar {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 20px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      select,
+      button {
+        font-size: 13.5px;
+        padding: 9px 14px;
+        border-radius: 9px;
+        border: 1px solid var(--border);
+        font-family: inherit;
+      }
+      select {
+        flex: 1;
+        min-width: 220px;
+        background: #fff;
+        color: var(--text);
+      }
+      button.primary {
+        background: var(--text);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      button.primary:hover {
+        background: #000;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px;
+        margin-bottom: 16px;
+      }
+      .card-title {
+        font-size: 13px;
+        font-weight: 700;
+        margin: 0 0 16px;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .card-title svg {
+        color: var(--faint);
+      }
+
+      /* Verdict */
+      .verdict {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+        align-items: center;
+      }
+      @media (max-width: 720px) {
+        .verdict {
+          grid-template-columns: 1fr;
+        }
+      }
+      .verdict-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .verdict-badge {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .verdict-badge.low {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .verdict-badge.high {
+        background: var(--red-soft);
+        color: var(--red);
+      }
+      .verdict-title {
+        font-size: 17px;
+        font-weight: 700;
+        margin: 0 0 2px;
+      }
+      .verdict-sub {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .gauge-score-big {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .gauge-score-big span {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--faint);
+      }
+
+      .grid2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      .grid3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      @media (max-width: 720px) {
+        .grid2,
+        .grid3 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .snap-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f2f4;
+      }
+      .snap-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .snap-item:first-child {
+        padding-top: 0;
+      }
+      .snap-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: #f4f5f7;
+        color: #4b5563;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .snap-name {
+        font-size: 11.5px;
+        color: var(--faint);
+        margin: 0 0 2px;
+      }
+      .snap-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0;
+      }
+      .snap-tag {
+        font-size: 11.5px;
+        color: var(--muted);
+        margin: 2px 0 0;
+      }
+
+      .reason-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f2f4;
+        font-size: 13.5px;
+      }
+      .reason-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .reason-item:first-child {
+        padding-top: 0;
+      }
+      .reason-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .reason-icon.up {
+        background: var(--red-soft);
+        color: var(--red);
+      }
+      .reason-icon.down {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .agree-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 0;
+        border-bottom: 1px solid #f1f2f4;
+        font-size: 13.5px;
+      }
+      .agree-row:last-child {
+        border-bottom: none;
+      }
+      .agree-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #374151;
+      }
+      .pill {
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 4px 11px;
+        border-radius: 999px;
+      }
+      .pill-low {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .pill-high {
+        background: var(--red-soft);
+        color: var(--red);
+      }
+      .banner {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .banner.ok {
+        background: var(--blue-soft);
+        color: #1e3a8a;
+      }
+      .banner.warn {
+        background: var(--amber-soft);
+        color: #92400e;
+      }
+
+      .action-box {
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        font-size: 13.5px;
+        line-height: 1.55;
+        margin-bottom: 16px;
+        display: flex;
+        gap: 14px;
+        border: 1px solid transparent;
+      }
+      .action-box .abx-icon {
+        flex-shrink: 0;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .action-standard {
+        background: var(--blue-soft);
+        border-color: #bfdbfe;
+      }
+      .action-standard .abx-icon {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .action-review {
+        background: var(--amber-soft);
+        border-color: #fde68a;
+      }
+      .action-review .abx-icon {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .action-caution {
+        background: var(--red-soft);
+        border-color: #fecaca;
+      }
+      .action-caution .abx-icon {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .action-box b {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+      .action-box p {
+        margin: 0;
+        color: #374151;
+      }
+
+      /* Tech tables */
+      .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--faint);
+        margin: 20px 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .section-label:first-child {
+        margin-top: 0;
+      }
+      .tech-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .tech-table th,
+      .tech-table td {
+        text-align: left;
+        padding: 9px 8px;
+        border-bottom: 1px solid #f1f2f4;
+      }
+      .tech-table th {
+        color: var(--faint);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 10.5px;
+        letter-spacing: 0.04em;
+      }
+      .tech-table td:last-child,
+      .tech-table th:last-child {
+        text-align: right;
+      }
+      .mono {
+        font-variant-numeric: tabular-nums;
+      }
+      .tech-note {
+        font-size: 11.5px;
+        color: var(--faint);
+        margin: 12px 0 0;
+      }
+
+      .footnote {
+        font-size: 11.5px;
+        color: var(--faint);
+        margin-top: 18px;
+        line-height: 1.6;
+      }
+
+      /* Bar chart */
+      .bar-row {
+        display: grid;
+        grid-template-columns: 128px 1fr 52px;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+        font-size: 12px;
+      }
+      .bar-label {
+        color: #4b5563;
+        text-align: right;
+      }
+      .bar-track {
+        position: relative;
+        height: 10px;
+        background: #f1f2f4;
+        border-radius: 6px;
+      }
+      .bar-fill {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        border-radius: 6px;
+      }
+      .bar-fill.pos {
+        background: linear-gradient(90deg, #f87171, #dc2626);
+        left: 50%;
+      }
+      .bar-fill.neg {
+        background: linear-gradient(90deg, #16a34a, #4ade80);
+        right: 50%;
+      }
+      .bar-mid {
+        position: absolute;
+        left: 50%;
+        top: -2px;
+        bottom: -2px;
+        width: 1px;
+        background: #d1d5db;
+      }
+      .bar-val {
+        color: var(--muted);
+        text-align: left;
+      }
+
+      /* Empty / loading states */
+      @keyframes shimmer {
+        0% {
+          background-position: -300px 0;
+        }
+        100% {
+          background-position: 300px 0;
+        }
+      }
+      .skel {
+        background: linear-gradient(
+          90deg,
+          #eef0f2 25%,
+          #f7f8fa 37%,
+          #eef0f2 63%
+        );
+        background-size: 600px 100%;
+        border-radius: 6px;
+        color: transparent !important;
+      }
+      .skel.animate {
+        animation: shimmer 1.4s linear infinite;
+      }
+      .skel-text {
+        display: inline-block;
+        height: 0.9em;
+        border-radius: 5px;
+      }
+      .empty-note {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        padding: 6px 0 2px;
+        font-size: 12.5px;
+        color: var(--faint);
+      }
+      .empty-note.loading {
+        color: #4b5563;
+        font-weight: 600;
+      }
+      .spin {
+        animation: spin 0.9s linear infinite;
+        transform-origin: center;
+      }
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .dim {
+        opacity: 0.55;
+      }
+      button.primary:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      .empty-badge {
+        background: #f1f2f4 !important;
+        color: var(--faint) !important;
+      }
+      .empty-pill {
+        background: #f1f2f4 !important;
+        color: var(--faint) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="page-head">
+        <div class="logo" id="icoLogo"></div>
+        <div>
+          <h1>SME Credit Profile Viewer</h1>
+          <p class="subtitle">
+            Alternative credit assessment from twelve months of transaction
+            history
+          </p>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <label style="font-size: 13px; color: #4b5563; font-weight: 600"
+          >Select business:</label
+        >
+        <select id="smeSelect">
+          <option value="0">Bello Foodstuff Traders (POS retail)</option>
+          <option value="1">Chika Beauty Supplies (mobile money)</option>
+          <option value="2">Okoro Building Materials (mixed channel)</option>
+        </select>
+        <button class="primary" id="scoreBtn"></button>
+      </div>
+
+      <div id="result" style="display: block">
+        <div class="card">
+          <div class="verdict">
+            <div class="verdict-left">
+              <div id="verdictBadge" class="verdict-badge"></div>
+              <div>
+                <p id="verdictTitle" class="verdict-title"></p>
+                <p id="verdictSub" class="verdict-sub"></p>
+              </div>
+            </div>
+            <div id="gaugeHolder"></div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <h2 class="card-title" id="titleSnapshot"></h2>
+            <div id="snapshot"></div>
+          </div>
+          <div class="card">
+            <h2 class="card-title" id="titleReasons"></h2>
+            <div id="reasons"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title" id="titleAgreement"></h2>
+          <div id="agreement"></div>
+        </div>
+
+        <div id="actionBox" class="action-box"></div>
+
+        <div class="card">
+          <h2 class="card-title" id="titleTech"></h2>
+
+          <p class="section-label">Model outputs</p>
+          <table class="tech-table">
+            <tr>
+              <th>Quantity</th>
+              <th>Value</th>
+            </tr>
+            <tbody id="techTable"></tbody>
+          </table>
+
+          <p class="section-label">Rule-based conditions triggered</p>
+          <table class="tech-table">
+            <tr>
+              <th>Condition</th>
+              <th>Points</th>
+            </tr>
+            <tbody id="ruleTable"></tbody>
+          </table>
+
+          <p class="section-label">SHAP feature contributions (full set)</p>
+          <div id="shapChart"></div>
+          <p class="tech-note">
+            A positive SHAP value pushes the prediction toward elevated-risk; a
+            negative value pushes it toward acceptable-risk. Values are the
+            actual model output for this SME, not illustrative figures.
+          </p>
+        </div>
+
+        <p class="footnote">
+          These three businesses are real rows drawn from the 1,000-observation
+          test partition described in Chapter Three, scored by the actual
+          trained rule-based and XGBoost hybrid model. Bello Foodstuff Traders
+          and Chika Beauty Supplies are correctly classified by the system;
+          Okoro Building Materials is a genuine borderline case, used in Chapter
+          Four, Section 4.8 to discuss the pipeline's limitations.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // ---------------------------------------------------------------------
+      // Minimal hand-built icon set, Lucide-style (24x24 stroke icons), so the
+      // page has zero external dependencies and renders identically everywhere.
+      // ---------------------------------------------------------------------
+      function icon(name, opts) {
+        opts = opts || {};
+        const s = opts.size || 18;
+        const c = opts.color || "currentColor";
+        const sw = opts.stroke || 2;
+        const paths = {
+          activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+          wallet:
+            '<path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/><path d="M16 12h.01"/><path d="M3 7h13a3 3 0 0 1 3 3v2"/>',
+          waves:
+            '<path d="M2 12c1-1 2-1.5 3-1.5s2 .5 3 1.5 2 1.5 3 1.5 2-.5 3-1.5 2-1.5 3-1.5 2 .5 3 1.5"/><path d="M2 17c1-1 2-1.5 3-1.5s2 .5 3 1.5 2 1.5 3 1.5 2-.5 3-1.5 2-1.5 3-1.5 2 .5 3 1.5"/>',
+          trendingUp:
+            '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+          trendingDown:
+            '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>',
+          minus: '<line x1="5" y1="12" x2="19" y2="12"/>',
+          calendar:
+            '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+          search:
+            '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+          checkCircle:
+            '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+          alertTriangle:
+            '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+          shieldCheck:
+            '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+          shieldAlert:
+            '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+          gitCompare:
+            '<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/>',
+          userCheck:
+            '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/>',
+          cpu: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/><line x1="20" y1="15" x2="23" y2="15"/>',
+          fileText:
+            '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+          listChecks:
+            '<line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/>',
+          arrowRight:
+            '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+          loader:
+            '<line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>',
+          inbox:
+            '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+        };
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${paths[name] || ""}</svg>`;
+      }
+
+      document.getElementById("icoLogo").innerHTML = icon("activity", {
+        size: 20,
+        color: "#fff",
+        stroke: 2.3,
+      });
+      document.getElementById("scoreBtn").innerHTML =
+        icon("search", { size: 15, color: "#fff" }) +
+        "<span>View credit profile</span>";
+      document.getElementById("titleSnapshot").innerHTML =
+        icon("cpu", { size: 15 }) + "<span>Business snapshot</span>";
+      document.getElementById("titleReasons").innerHTML =
+        icon("search", { size: 15 }) + "<span>Why this rating</span>";
+      document.getElementById("titleAgreement").innerHTML =
+        icon("gitCompare", { size: 15 }) +
+        "<span>Do the rule check and the AI model agree?</span>";
+      document.getElementById("titleTech").innerHTML =
+        icon("fileText", { size: 15 }) +
+        "<span>Technical scoring details</span>";
+
+      // ---------------------------------------------------------------------
+      // Precomputed, real outputs from the trained pipeline (rule score,
+      // XGBoost probability, hybrid score, SHAP values, engineered features).
+      // Embedded directly so this page needs no backend to run.
+      // ---------------------------------------------------------------------
+      const RESULTS = [
+        {
+          sme_name: "Bello Foodstuff Traders",
+          rule_score: 0.3077,
+          rule_points: 4,
+          rule_max_points: 13,
+          triggered_rules: [
+            {
+              description:
+                "Coefficient of variation of monthly totals above 0.42",
+              points: 2,
+            },
+            {
+              description:
+                "Negative growth trend across the observation window",
+              points: 2,
+            },
+          ],
+          xgboost_probability: 0.0025,
+          hybrid_score: 0.1551,
+          alpha_used: 0.5,
+          decision_threshold: 0.579,
+          t_rule: 0.615,
+          t_xgb: 0.613,
+          risk_category: "Acceptable-risk",
+          features: {
+            transaction_frequency: 59.5,
+            total_volume: 8666481.06,
+            avg_transaction_value: 12137.93,
+            volatility: 0.4246,
+            seasonality: 2.1949,
+            cashflow_net: -1923348.95,
+            cashflow_stability: 0.0715,
+            growth_trend: -0.0329,
+          },
+          shap_contributions: [
+            {
+              feature: "cashflow_stability",
+              shap_value: -2.5616,
+              feature_value: 0.0715,
+            },
+            {
+              feature: "transaction_frequency",
+              shap_value: -1.4477,
+              feature_value: 59.5,
+            },
+            {
+              feature: "total_volume",
+              shap_value: -1.0745,
+              feature_value: 8666481.06,
+            },
+            {
+              feature: "growth_trend",
+              shap_value: -0.4164,
+              feature_value: -0.0329,
+            },
+            {
+              feature: "cashflow_net",
+              shap_value: -0.3652,
+              feature_value: -1923348.95,
+            },
+            {
+              feature: "seasonality",
+              shap_value: -0.1701,
+              feature_value: 2.1949,
+            },
+            {
+              feature: "avg_transaction_value",
+              shap_value: -0.0971,
+              feature_value: 12137.93,
+            },
+            {
+              feature: "volatility",
+              shap_value: -0.0807,
+              feature_value: 0.4246,
+            },
+          ],
+        },
+        {
+          sme_name: "Chika Beauty Supplies",
+          rule_score: 0.6923,
+          rule_points: 9,
+          rule_max_points: 13,
+          triggered_rules: [
+            {
+              description: "Fewer than 22 transactions per month on average",
+              points: 2,
+            },
+            {
+              description:
+                "Total annual transaction volume below NGN 3,000,000",
+              points: 2,
+            },
+            {
+              description:
+                "Coefficient of variation of monthly totals above 0.42",
+              points: 2,
+            },
+            { description: "Net cash-flow instability above 0.30", points: 3 },
+          ],
+          xgboost_probability: 0.985,
+          hybrid_score: 0.8386,
+          alpha_used: 0.5,
+          decision_threshold: 0.579,
+          t_rule: 0.615,
+          t_xgb: 0.613,
+          risk_category: "Elevated-risk",
+          features: {
+            transaction_frequency: 17.67,
+            total_volume: 1487360.5,
+            avg_transaction_value: 7015.85,
+            volatility: 0.6483,
+            seasonality: 1.4883,
+            cashflow_net: -1465256.83,
+            cashflow_stability: 0.6448,
+            growth_trend: 0.1615,
+          },
+          shap_contributions: [
+            {
+              feature: "cashflow_stability",
+              shap_value: 2.3777,
+              feature_value: 0.6448,
+            },
+            {
+              feature: "total_volume",
+              shap_value: 1.3541,
+              feature_value: 1487360.5,
+            },
+            {
+              feature: "growth_trend",
+              shap_value: -1.0365,
+              feature_value: 0.1615,
+            },
+            {
+              feature: "transaction_frequency",
+              shap_value: 0.5067,
+              feature_value: 17.67,
+            },
+            {
+              feature: "avg_transaction_value",
+              shap_value: 0.5064,
+              feature_value: 7015.85,
+            },
+            {
+              feature: "seasonality",
+              shap_value: 0.1539,
+              feature_value: 1.4883,
+            },
+            {
+              feature: "volatility",
+              shap_value: 0.0855,
+              feature_value: 0.6483,
+            },
+            {
+              feature: "cashflow_net",
+              shap_value: 0.0293,
+              feature_value: -1465256.83,
+            },
+          ],
+        },
+        {
+          sme_name: "Okoro Building Materials",
+          rule_score: 0.3077,
+          rule_points: 4,
+          rule_max_points: 13,
+          triggered_rules: [
+            { description: "Net cash-flow instability above 0.30", points: 3 },
+            {
+              description: "Cumulative net cash flow below NGN -2,000,000",
+              points: 1,
+            },
+          ],
+          xgboost_probability: 0.7991,
+          hybrid_score: 0.5534,
+          alpha_used: 0.5,
+          decision_threshold: 0.579,
+          t_rule: 0.615,
+          t_xgb: 0.613,
+          risk_category: "Acceptable-risk",
+          features: {
+            transaction_frequency: 44.67,
+            total_volume: 15722317.7,
+            avg_transaction_value: 29332.68,
+            volatility: 0.35,
+            seasonality: 1.5251,
+            cashflow_net: -15349026.8,
+            cashflow_stability: 0.344,
+            growth_trend: 0.0563,
+          },
+          shap_contributions: [
+            {
+              feature: "total_volume",
+              shap_value: -0.916,
+              feature_value: 15722317.7,
+            },
+            {
+              feature: "cashflow_stability",
+              shap_value: 0.8097,
+              feature_value: 0.344,
+            },
+            {
+              feature: "cashflow_net",
+              shap_value: 0.8055,
+              feature_value: -15349026.8,
+            },
+            {
+              feature: "avg_transaction_value",
+              shap_value: 0.4336,
+              feature_value: 29332.68,
+            },
+            {
+              feature: "seasonality",
+              shap_value: 0.3914,
+              feature_value: 1.5251,
+            },
+            {
+              feature: "transaction_frequency",
+              shap_value: -0.3411,
+              feature_value: 44.67,
+            },
+            {
+              feature: "growth_trend",
+              shap_value: -0.1641,
+              feature_value: 0.0563,
+            },
+            { feature: "volatility", shap_value: 0.1557, feature_value: 0.35 },
+          ],
+        },
+      ];
+
+      const FEATURE_LABEL = {
+        cashflow_stability: "Cash flow stability",
+        total_volume: "Transaction volume",
+        transaction_frequency: "Transaction frequency",
+        growth_trend: "Growth trend",
+        cashflow_net: "Net cash flow",
+        seasonality: "Seasonal pattern",
+        avg_transaction_value: "Average transaction size",
+        volatility: "Transaction volatility",
+      };
+
+      function naira(n) {
+        const sign = n < 0 ? "-" : "";
+        return (
+          sign + "\u20A6" + Math.abs(Math.round(n)).toLocaleString("en-NG")
+        );
+      }
+      function freqTag(f) {
+        return f >= 40
+          ? "Very active"
+          : f >= 20
+            ? "Moderately active"
+            : "Low activity";
+      }
+      function volatilityTag(v) {
+        return v < 0.35
+          ? "Stable"
+          : v < 0.55
+            ? "Somewhat variable"
+            : "Highly variable";
+      }
+      function stabilityTag(s) {
+        return s < 0.15
+          ? "Very stable"
+          : s < 0.35
+            ? "Somewhat unstable"
+            : "Unstable";
+      }
+      function growthTag(g) {
+        return g > 0.02 ? "Growing" : g > -0.02 ? "Steady" : "Declining";
+      }
+      function seasonTag(se) {
+        return se < 1.5
+          ? "Fairly steady all year"
+          : se < 2.2
+            ? "Some seasonal swings"
+            : "Highly seasonal";
+      }
+
+      // Arc gauge: 180-degree SVG gauge with a needle, three risk zones.
+      // Arc gauge: 180-degree SVG gauge with a needle, three risk zones.
+      // neutral=true draws a flat grey arc with no needle, for empty/loading states.
+      function renderGauge(score100, neutral) {
+        const cx = 100,
+          cy = 100,
+          r = 78;
+        const toXY = (deg) => {
+          const rad = (Math.PI / 180) * deg;
+          return [cx - r * Math.cos(rad), cy - r * Math.sin(rad)];
+        };
+        const arc = (startDeg, endDeg, color) => {
+          const [x1, y1] = toXY(startDeg);
+          const [x2, y2] = toXY(endDeg);
+          return `<path d="M ${x1} ${y1} A ${r} ${r} 0 0 0 ${x2} ${y2}" stroke="${color}" stroke-width="14" fill="none" stroke-linecap="round"/>`;
+        };
+
+        if (neutral) {
+          return `
+    <svg viewBox="0 0 200 118" width="220" height="130">
+      ${arc(180, 0, "#e9eaec")}
+    </svg>`;
+        }
+
+        const needleDeg = 180 - (score100 / 100) * 180;
+        const [nx, ny] = toXY(needleDeg);
+
+        return `
+  <svg viewBox="0 0 200 118" width="220" height="130">
+    ${arc(180, 108, "#22c55e")}
+    ${arc(108, 72, "#eab308")}
+    ${arc(72, 0, "#ef4444")}
+    <line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="#111827" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="6" fill="#111827"/>
+  </svg>`;
+      }
+
+      function skelBar(widthPx, animate) {
+        return `<span class="skel skel-text ${animate ? "animate" : ""}" style="width:${widthPx}px">&nbsp;</span>`;
+      }
+
+      // Empty (no selection yet) and loading (mid-simulated-fetch) placeholder,
+      // sharing one renderer so both states stay visually consistent.
+      function renderPlaceholder(mode) {
+        const loading = mode === "loading";
+        const smeName = loading
+          ? RESULTS[parseInt(document.getElementById("smeSelect").value, 10)]
+              .sme_name
+          : null;
+
+        document.getElementById("verdictBadge").className =
+          "verdict-badge neutral";
+        document.getElementById("verdictBadge").innerHTML = icon(
+          loading ? "loader" : "inbox",
+          { size: 24, color: "#9ca3af" },
+        );
+        if (loading)
+          document
+            .getElementById("verdictBadge")
+            .querySelector("svg")
+            .classList.add("spin");
+        document.getElementById("verdictTitle").textContent = loading
+          ? "Analysing transaction history\u2026"
+          : "No business selected yet";
+        document.getElementById("verdictSub").textContent = loading
+          ? smeName + " \u2014 running the rule-based and AI checks"
+          : "Choose a business above and click \u201cView credit profile\u201d";
+
+        document.getElementById("gaugeHolder").innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:center; gap:18px;">
+      ${renderGauge(0, true)}
+      <div>
+        <div class="gauge-score-big dim">\u2014<span>/100</span></div>
+        <div style="font-size:11.5px; color:var(--faint); margin-top:2px;">Risk score</div>
+      </div>
+    </div>`;
+
+        const snapEl = document.getElementById("snapshot");
+        snapEl.innerHTML = "";
+        [140, 110, 130, 95].forEach(() => {
+          const row = document.createElement("div");
+          row.className = "snap-item";
+          row.innerHTML = `<div class="snap-icon" style="background:#f1f2f4;"></div>
+      <div>
+        <p class="snap-name">${skelBar(90, loading)}</p>
+        <p class="snap-value">${skelBar(120, loading)}</p>
+        <p class="snap-tag">${skelBar(70, loading)}</p>
+      </div>`;
+          snapEl.appendChild(row);
+        });
+
+        const reasonsEl = document.getElementById("reasons");
+        reasonsEl.innerHTML = "";
+        [200, 170, 190, 150].forEach((w) => {
+          const row = document.createElement("div");
+          row.className = "reason-item";
+          row.innerHTML = `<span class="reason-icon" style="background:#f1f2f4;"></span><span>${skelBar(w, loading)}</span>`;
+          reasonsEl.appendChild(row);
+        });
+
+        document.getElementById("agreement").innerHTML = `
+    <div class="agree-row">
+      <span class="agree-left">${icon("listChecks", { size: 15, color: "#c6c9ce" })}Rule-based check (explicit conditions on transaction data)</span>
+      <span class="pill empty-pill">${skelBar(48, loading)}</span>
+    </div>
+    <div class="agree-row">
+      <span class="agree-left">${icon("cpu", { size: 15, color: "#c6c9ce" })}AI model (learns patterns from thousands of past examples)</span>
+      <span class="pill empty-pill">${skelBar(48, loading)}</span>
+    </div>
+    <div class="empty-note ${loading ? "loading" : ""}">
+      ${loading ? icon("loader", { size: 14, color: "#4b5563" }) : icon("inbox", { size: 14, color: "#c6c9ce" })}
+      ${loading ? "Comparing the two verdicts\u2026" : "Generate a credit profile to compare the two checks."}
+    </div>`;
+        if (loading)
+          document
+            .querySelector("#agreement .empty-note svg")
+            ?.classList.add("spin");
+
+        const actionEl = document.getElementById("actionBox");
+        actionEl.className = "action-box";
+        actionEl.style.background = "#f7f8fa";
+        actionEl.style.borderColor = "#e5e7eb";
+        actionEl.innerHTML = `<div class="abx-icon" style="background:#eef0f2; color:#9ca3af;">${icon(loading ? "loader" : "inbox", { size: 18 })}</div>
+    <div><b style="color:#6b7280;">Suggested next step</b><p style="color:#9ca3af;">${loading ? "Working out a recommendation\u2026" : "This will appear once you generate a credit profile."}</p></div>`;
+        if (loading)
+          actionEl.querySelector(".abx-icon svg").classList.add("spin");
+
+        document.getElementById("techTable").innerHTML = [
+          ["Rule score", skelBar(160, loading)],
+          ["XGBoost probability", skelBar(140, loading)],
+          ["Hybrid score", skelBar(170, loading)],
+          ["Risk category (system output)", skelBar(100, loading)],
+        ]
+          .map(([k, v]) => `<tr><td>${k}</td><td class="mono">${v}</td></tr>`)
+          .join("");
+
+        document.getElementById("ruleTable").innerHTML =
+          `<tr><td>${skelBar(220, loading)}</td><td class="mono">${skelBar(28, loading)}</td></tr>
+     <tr><td>${skelBar(180, loading)}</td><td class="mono">${skelBar(28, loading)}</td></tr>`;
+
+        document.getElementById("shapChart").innerHTML = [130, 110, 95, 80, 60]
+          .map(
+            (w) => `
+    <div class="bar-row">
+      <div class="bar-label">${skelBar(90, loading)}</div>
+      <div class="bar-track"><div class="bar-mid"></div></div>
+      <div class="bar-val">${skelBar(30, loading)}</div>
+    </div>`,
+          )
+          .join("");
+      }
+
+      function render() {
+        const idx = parseInt(document.getElementById("smeSelect").value, 10);
+        const d = RESULTS[idx];
+        const f = d.features;
+        const elevated = d.risk_category === "Elevated-risk";
+        const score100 = Math.round(d.hybrid_score * 100);
+
+        document.getElementById("result").style.display = "block";
+
+        document.getElementById("verdictBadge").className =
+          "verdict-badge " + (elevated ? "high" : "low");
+        document.getElementById("verdictBadge").innerHTML = icon(
+          elevated ? "shieldAlert" : "shieldCheck",
+          { size: 26 },
+        );
+        document.getElementById("verdictTitle").textContent = elevated
+          ? "This business looks higher risk"
+          : "This business looks lower risk";
+        document.getElementById("verdictSub").textContent =
+          d.sme_name +
+          " \u2014 reviewed on twelve months of transaction history";
+
+        document.getElementById("gaugeHolder").innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:center; gap:18px;">
+      ${renderGauge(score100)}
+      <div>
+        <div class="gauge-score-big">${score100}<span>/100</span></div>
+        <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Risk score</div>
+      </div>
+    </div>`;
+
+        // Business snapshot
+        const snapshotItems = [
+          [
+            "activity",
+            "Monthly activity",
+            f.transaction_frequency.toFixed(1) + " transactions/month",
+            freqTag(f.transaction_frequency),
+          ],
+          [
+            "wallet",
+            "Yearly transaction volume",
+            naira(f.total_volume),
+            "Average sale: " + naira(f.avg_transaction_value),
+          ],
+          [
+            "waves",
+            "Cash flow stability",
+            stabilityTag(f.cashflow_stability),
+            "Net flow: " + naira(f.cashflow_net),
+          ],
+          [
+            f.growth_trend > 0.02
+              ? "trendingUp"
+              : f.growth_trend < -0.02
+                ? "trendingDown"
+                : "minus",
+            "Growth trend",
+            growthTag(f.growth_trend),
+            growthTag(f.growth_trend) === "Declining"
+              ? "Activity has slowed over the year"
+              : growthTag(f.growth_trend) === "Growing"
+                ? "Activity has picked up over the year"
+                : "Activity held roughly steady",
+          ],
+          [
+            "calendar",
+            "Seasonal pattern",
+            seasonTag(f.seasonality),
+            "Volatility: " + volatilityTag(f.volatility),
+          ],
+        ];
+        const snapEl = document.getElementById("snapshot");
+        snapEl.innerHTML = "";
+        snapshotItems.forEach(([ic, name, value, tag]) => {
+          const row = document.createElement("div");
+          row.className = "snap-item";
+          row.innerHTML = `<div class="snap-icon">${icon(ic, { size: 16 })}</div>
+      <div><p class="snap-name">${name}</p><p class="snap-value">${value}</p><p class="snap-tag">${tag}</p></div>`;
+          snapEl.appendChild(row);
+        });
+
+        // Reasons (plain-language SHAP)
+        const reasonsEl = document.getElementById("reasons");
+        reasonsEl.innerHTML = "";
+        d.shap_contributions.slice(0, 5).forEach((c) => {
+          const up = c.shap_value >= 0;
+          const row = document.createElement("div");
+          row.className = "reason-item";
+          row.innerHTML = `<span class="reason-icon ${up ? "up" : "down"}">${icon(up ? "trendingUp" : "trendingDown", { size: 14 })}</span>
+      <span>${FEATURE_LABEL[c.feature]} ${up ? "is pushing the risk score up" : "is helping lower the risk score"}</span>`;
+          reasonsEl.appendChild(row);
+        });
+
+        // Rule vs AI agreement
+        const ruleVerdict = d.rule_score >= d.t_rule ? "High risk" : "Low risk";
+        const aiVerdict =
+          d.xgboost_probability >= d.t_xgb ? "High risk" : "Low risk";
+        const agree = ruleVerdict === aiVerdict;
+        document.getElementById("agreement").innerHTML = `
+    <div class="agree-row">
+      <span class="agree-left">${icon("listChecks", { size: 15, color: "#6b7280" })}Rule-based check (explicit conditions on transaction data)</span>
+      <span class="pill ${ruleVerdict === "High risk" ? "pill-high" : "pill-low"}">${ruleVerdict}</span>
+    </div>
+    <div class="agree-row">
+      <span class="agree-left">${icon("cpu", { size: 15, color: "#6b7280" })}AI model (learns patterns from thousands of past examples)</span>
+      <span class="pill ${aiVerdict === "High risk" ? "pill-high" : "pill-low"}">${aiVerdict}</span>
+    </div>
+    <div class="banner ${agree ? "ok" : "warn"}">
+      ${icon(agree ? "checkCircle" : "alertTriangle", { size: 16 })}
+      ${
+        agree
+          ? "Both checks agree, so this rating can be trusted with normal confidence."
+          : "The two checks disagree. This is a borderline case and is worth a manual look before deciding."
+      }
+    </div>`;
+
+        // Recommended action
+        const actionEl = document.getElementById("actionBox");
+        actionEl.removeAttribute("style");
+        if (!agree) {
+          actionEl.className = "action-box action-review";
+          actionEl.innerHTML = `<div class="abx-icon">${icon("userCheck", { size: 18 })}</div>
+      <div><b>Suggested next step: Manual review</b><p>The automated checks disagree on this business, so treat the score as inconclusive on its own. Ask for extra documentation, such as recent bank or mobile money statements, before making a decision.</p></div>`;
+        } else if (elevated) {
+          actionEl.className = "action-box action-caution";
+          actionEl.innerHTML = `<div class="abx-icon">${icon("alertTriangle", { size: 18 })}</div>
+      <div><b>Suggested next step: Extra caution</b><p>Both checks point to higher risk. Consider a smaller loan amount, added collateral, or closer repayment monitoring if proceeding.</p></div>`;
+        } else {
+          actionEl.className = "action-box action-standard";
+          actionEl.innerHTML = `<div class="abx-icon">${icon("checkCircle", { size: 18 })}</div>
+      <div><b>Suggested next step: Standard terms</b><p>Both checks point to lower risk. This business looks eligible for standard lending terms, subject to your usual policy checks.</p></div>`;
+        }
+
+        // Technical: model outputs
+        document.getElementById("techTable").innerHTML = [
+          [
+            "Rule score",
+            `${d.rule_score.toFixed(4)} (${d.rule_points}/${d.rule_max_points} points) \u2014 threshold ${d.t_rule}`,
+          ],
+          [
+            "XGBoost probability",
+            `${d.xgboost_probability.toFixed(4)} \u2014 threshold ${d.t_xgb}`,
+          ],
+          [
+            "Hybrid score",
+            `${d.hybrid_score.toFixed(4)} (alpha = ${d.alpha_used}) \u2014 threshold ${d.decision_threshold}`,
+          ],
+          ["Risk category (system output)", d.risk_category],
+        ]
+          .map(([k, v]) => `<tr><td>${k}</td><td class="mono">${v}</td></tr>`)
+          .join("");
+
+        // Technical: rule conditions
+        document.getElementById("ruleTable").innerHTML =
+          d.triggered_rules.length === 0
+            ? `<tr><td colspan="2">No conditions triggered</td></tr>`
+            : d.triggered_rules
+                .map(
+                  (r) =>
+                    `<tr><td>${r.description}</td><td class="mono">+${r.points}</td></tr>`,
+                )
+                .join("");
+
+        // Technical: SHAP bar chart (custom, no chart library dependency)
+        const allShap = [...d.shap_contributions].sort(
+          (a, b) => Math.abs(b.shap_value) - Math.abs(a.shap_value),
+        );
+        const maxAbs = Math.max(
+          ...allShap.map((c) => Math.abs(c.shap_value)),
+          0.001,
+        );
+        document.getElementById("shapChart").innerHTML = allShap
+          .map((c) => {
+            const pct = (Math.abs(c.shap_value) / maxAbs) * 48;
+            const isCurrency = [
+              "total_volume",
+              "cashflow_net",
+              "avg_transaction_value",
+            ].includes(c.feature);
+            const valStr = isCurrency
+              ? naira(c.feature_value)
+              : c.feature_value.toFixed(3);
+            return `<div class="bar-row">
+      <div class="bar-label">${FEATURE_LABEL[c.feature]}</div>
+      <div class="bar-track"><div class="bar-mid"></div><div class="bar-fill ${c.shap_value >= 0 ? "pos" : "neg"}" style="width:${pct}%"></div></div>
+      <div class="bar-val">${c.shap_value >= 0 ? "+" : ""}${c.shap_value.toFixed(2)}</div>
+    </div>
+    <div style="font-size:10.5px; color:var(--faint); margin:-6px 0 0 138px;">value: ${valStr}</div>`;
+          })
+          .join("");
+      }
+
+      document.getElementById("scoreBtn").addEventListener("click", () => {
+        const btn = document.getElementById("scoreBtn");
+        btn.disabled = true;
+        renderPlaceholder("loading");
+        setTimeout(() => {
+          render();
+          btn.disabled = false;
+        }, 2000);
+      });
+      document
+        .getElementById("smeSelect")
+        .addEventListener("change", () => renderPlaceholder("empty"));
+      window.addEventListener("DOMContentLoaded", () =>
+        renderPlaceholder("empty"),
+      );
+    </script>
+  </body>
+</html>
