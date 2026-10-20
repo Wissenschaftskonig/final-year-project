@@ -14,12 +14,13 @@ and returns:
   - the resulting risk category (acceptable-risk / elevated-risk)
   - the top SHAP feature contributions for that specific prediction
 
-This lets the Next.js dashboard (or any client) request a full credit
+This lets the dashboard (or any client) request a full credit
 profile for a single SME without re-running the training pipeline.
 """
 
 import json
 import os
+from pathlib import Path
 
 import numpy as np
 import shap
@@ -28,9 +29,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH = os.path.join(BASE_DIR, "models", "xgboost_model.json")
-THRESHOLDS_PATH = os.path.join(BASE_DIR, "outputs", "selected_thresholds.json")
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "models" / "xgboost_model.json"
+THRESHOLDS_PATH = BASE_DIR / "outputs" / "selected_thresholds.json"
 
 FEATURE_COLS = [
     "transaction_frequency",
@@ -110,7 +111,7 @@ def health():
 
 @app.post("/score/features")
 def score_features(payload: SMEFeatures):
-    features = payload.dict(exclude={"sme_name"})
+    features = payload.model_dump(exclude={"sme_name"})
     x = np.array([[features[c] for c in FEATURE_COLS]])
 
     r_score, triggered_rules = rule_score(features)
