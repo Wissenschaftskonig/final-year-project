@@ -28,7 +28,20 @@ generated data. They do not show predictive performance on live Nigerian lending
 
 ## Setup
 
-Tested environment: Python 3.12, macOS 13.6, Apple M2, 16 GB RAM.
+Tested environment: Python 3.12.15, macOS 15.5 (Darwin 25.5.0), Apple M4, 16 GB RAM.
+
+Exact dependency versions (pinned in `requirements.txt`):
+- `numpy==2.4.4`
+- `pandas==3.0.2`
+- `scikit-learn==1.8.0`
+- `xgboost==3.4.1`
+- `shap==0.54.1`
+- `scipy==1.17.1`
+- `matplotlib==3.11.2`
+- `fastapi==0.152.0`
+- `uvicorn==0.54.0`
+- `httpx==0.28.1`
+- `pydantic==2.14.1`
 
 ```bash
 python -m venv .venv
