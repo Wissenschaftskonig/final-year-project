@@ -19,6 +19,8 @@ import pandas as pd
 
 from paths import DATA_DIR
 
+N_MONTHS = 12
+
 
 def _seasonality_score(monthly_totals):
     """Amplitude of the dominant periodic component relative to the mean

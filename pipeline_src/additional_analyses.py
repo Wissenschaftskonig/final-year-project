@@ -15,6 +15,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import xgboost as xgb
+import shap
 from scipy import stats
 from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
