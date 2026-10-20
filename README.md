@@ -12,25 +12,26 @@ generated data. They do not show predictive performance on live Nigerian lending
 
 ## Repository layout
 
-| Path | Purpose |
-|---|---|
-| `pipeline_src/data_generator.py` | Generates 5,000 synthetic SME transaction logs (12 months each) with latent low, moderate and high risk groups in 60:30:10 proportions. |
+| Path                                  | Purpose                                                                                                                                                                                                                                                    |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pipeline_src/data_generator.py`      | Generates 5,000 synthetic SME transaction logs (12 months each) with latent low, moderate and high risk groups in 60:30:10 proportions.                                                                                                                    |
 | `pipeline_src/feature_engineering.py` | Converts each log into eight features: transaction frequency, total volume, average transaction value, volatility, seasonality, net cash flow, cash-flow stability, growth trend. Target is 1 for the latent high-risk group (elevated risk), 0 otherwise. |
-| `pipeline_src/rule_scoring.py` | Applies seven fixed rules (maximum 13 points) and normalises to a score between 0 and 1. |
-| `pipeline_src/train_evaluate.py` | 80:20 stratified split, 5-fold cross-validation (seeds 1, 2, 3), threshold and alpha selection on the training partition, test-set comparison of the rule-based, XGBoost and hybrid models, feature importance and SHAP. Saves the model to `models/`. |
-| `pipeline_src/additional_analyses.py` | Bootstrap confidence intervals, McNemar and DeLong tests, cross-validated AUC for all three models, feature ablation, component-disagreement analysis, dashboard examples. |
-| `scoring_api.py` | FastAPI service exposing `POST /score/features`. |
-| `dashboard.html` | Single-page lender dashboard. It displays three precomputed SME profiles embedded in the page, with the same fields as the API response. It is not connected to the live API. |
-| `models/` | Trained XGBoost model (`xgboost_model.json`). |
-| `outputs/` | Result tables, thresholds and figures produced by the pipeline. |
-| `run_all.sh` | Runs the full pipeline in order. |
-| `verify_reproduction.py` | Checks the generated results against the values reported in the thesis. |
+| `pipeline_src/rule_scoring.py`        | Applies seven fixed rules (maximum 13 points) and normalises to a score between 0 and 1.                                                                                                                                                                   |
+| `pipeline_src/train_evaluate.py`      | 80:20 stratified split, 5-fold cross-validation (seeds 1, 2, 3), threshold and alpha selection on the training partition, test-set comparison of the rule-based, XGBoost and hybrid models, feature importance and SHAP. Saves the model to `models/`.     |
+| `pipeline_src/additional_analyses.py` | Bootstrap confidence intervals, McNemar and DeLong tests, cross-validated AUC for all three models, feature ablation, component-disagreement analysis, dashboard examples.                                                                                 |
+| `scoring_api.py`                      | FastAPI service exposing `POST /score/features`.                                                                                                                                                                                                           |
+| `dashboard.html`                      | Single-page lender dashboard. It displays three precomputed SME profiles embedded in the page, with the same fields as the API response. It is not connected to the live API.                                                                              |
+| `models/`                             | Trained XGBoost model (`xgboost_model.json`).                                                                                                                                                                                                              |
+| `outputs/`                            | Result tables, thresholds and figures produced by the pipeline.                                                                                                                                                                                            |
+| `run_all.sh`                          | Runs the full pipeline in order.                                                                                                                                                                                                                           |
+| `verify_reproduction.py`              | Checks the generated results against the values reported in the thesis.                                                                                                                                                                                    |
 
 ## Setup
 
-Tested environment: Python 3.12.15, macOS 15.5 (Darwin 25.5.0), Apple M4, 16 GB RAM.
+Tested environment: Python 3.12.15, macOS 26.5.2, Apple M4, 16 GB RAM.
 
 Exact dependency versions (pinned in `requirements.txt`):
+
 - `numpy==2.4.4`
 - `pandas==3.0.2`
 - `scikit-learn==1.8.0`
@@ -66,11 +67,11 @@ the last decimal place can occur on other library versions or hardware.
 
 ## Main results (untouched test set, 1,000 SMEs, 99 elevated risk)
 
-| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
-|---|---|---|---|---|---|
-| Rule-based | 0.879 | 0.408 | 0.495 | 0.447 | 0.783 |
-| XGBoost | 0.884 | 0.432 | 0.545 | 0.482 | 0.858 |
-| Hybrid (alpha 0.50) | 0.886 | 0.440 | 0.556 | 0.491 | 0.841 |
+| Model               | Accuracy | Precision | Recall | F1    | ROC-AUC |
+| ------------------- | -------- | --------- | ------ | ----- | ------- |
+| Rule-based          | 0.879    | 0.408     | 0.495  | 0.447 | 0.783   |
+| XGBoost             | 0.884    | 0.432     | 0.545  | 0.482 | 0.858   |
+| Hybrid (alpha 0.50) | 0.886    | 0.440     | 0.556  | 0.491 | 0.841   |
 
 The hybrid model's F1 advantage over XGBoost is not statistically distinguishable from zero on this test set
 (95% bootstrap interval for the difference: -0.036 to +0.056).
