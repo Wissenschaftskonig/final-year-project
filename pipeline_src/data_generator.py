@@ -19,6 +19,8 @@ direct target leakage.
 import numpy as np
 import pandas as pd
 
+from paths import DATA_DIR
+
 N_SMES = 5000
 N_MONTHS = 12
 RISK_PROPORTIONS = {"low": 0.60, "moderate": 0.30, "high": 0.10}
@@ -56,7 +58,7 @@ def generate_transaction_log(n_smes=N_SMES, n_months=N_MONTHS, seed=RANDOM_SEED)
     """Return (sme_profile_df, transactions_df).
 
     sme_profile_df: one row per SME with the latent risk group (generation
-    control only â€” not a model input).
+    control only - not a model input).
 
     transactions_df: one row per individual simulated transaction, with
     columns [sme_id, month, day, amount, direction], where direction is
@@ -127,8 +129,8 @@ def generate_transaction_log(n_smes=N_SMES, n_months=N_MONTHS, seed=RANDOM_SEED)
 
 if __name__ == "__main__":
     profiles, tx = generate_transaction_log()
-    profiles.to_csv("/home/claude/credit-scoring/data/sme_profiles.csv", index=False)
-    tx.to_csv("/home/claude/credit-scoring/data/transactions_raw.csv", index=False)
+    profiles.to_csv(DATA_DIR / "sme_profiles.csv", index=False)
+    tx.to_csv(DATA_DIR / "transactions_raw.csv", index=False)
     print("SMEs:", len(profiles))
     print(profiles["latent_risk"].value_counts(normalize=True))
     print("Total transactions:", len(tx))

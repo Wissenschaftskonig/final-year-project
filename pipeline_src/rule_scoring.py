@@ -14,6 +14,8 @@ with the XGBoost probability in Section 3.10.
 
 import pandas as pd
 
+from paths import DATA_DIR
+
 RULES = [
     ("low_frequency", lambda r: r["transaction_frequency"] < 22, 2),
     ("low_volume", lambda r: r["total_volume"] < 3_000_000, 2),
@@ -51,9 +53,9 @@ def apply_rule_scoring(df):
 
 
 if __name__ == "__main__":
-    dataset = pd.read_csv("/home/claude/credit-scoring/data/feature_dataset.csv")
+    dataset = pd.read_csv(DATA_DIR / "feature_dataset.csv")
     scored = apply_rule_scoring(dataset)
-    scored.to_csv("/home/claude/credit-scoring/data/dataset_with_rule_score.csv", index=False)
+    scored.to_csv(DATA_DIR / "dataset_with_rule_score.csv", index=False)
 
     print("Max attainable points:", MAX_POINTS)
     print(scored.groupby("target")["rule_score"].describe())

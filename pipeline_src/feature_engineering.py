@@ -17,7 +17,7 @@ are fixed here before any model is trained (Section 3.5 / 3.7).
 import numpy as np
 import pandas as pd
 
-N_MONTHS = 12
+from paths import DATA_DIR
 
 
 def _seasonality_score(monthly_totals):
@@ -109,14 +109,14 @@ def engineer_features(transactions_df, n_smes, n_months=N_MONTHS):
 
 
 if __name__ == "__main__":
-    profiles = pd.read_csv("/home/claude/credit-scoring/data/sme_profiles.csv")
-    tx = pd.read_csv("/home/claude/credit-scoring/data/transactions_raw.csv")
+    profiles = pd.read_csv(DATA_DIR / "sme_profiles.csv")
+    tx = pd.read_csv(DATA_DIR / "transactions_raw.csv")
 
     features = engineer_features(tx, n_smes=len(profiles))
     dataset = features.merge(profiles, on="sme_id")
     dataset["target"] = (dataset["latent_risk"] == "high").astype(int)
 
-    dataset.to_csv("/home/claude/credit-scoring/data/feature_dataset.csv", index=False)
+    dataset.to_csv(DATA_DIR / "feature_dataset.csv", index=False)
     print(dataset.shape)
     print(dataset["target"].value_counts(normalize=True))
     print(dataset.describe().T)

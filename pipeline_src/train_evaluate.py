@@ -39,10 +39,12 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
+from paths import DATA_DIR, OUTPUT_DIR, MODEL_DIR
+
 warnings.filterwarnings("ignore")
 
-DATA_PATH = "/home/claude/credit-scoring/data/dataset_with_rule_score.csv"
-OUT_DIR = "/home/claude/credit-scoring/outputs"
+DATA_PATH = DATA_DIR / "dataset_with_rule_score.csv"
+OUT_DIR = OUTPUT_DIR
 
 FEATURE_COLS = [
     "transaction_frequency",
@@ -143,8 +145,8 @@ def main():
     # --- 1. Cross-validation on the training partition -------------------
     cv_results = run_cross_validation(X_train, y_train)
     cv_summary = cv_results.drop(columns=["seed", "fold"]).agg(["mean", "std"]).T
-    cv_summary.to_csv(f"{OUT_DIR}/cv_summary.csv")
-    cv_results.to_csv(f"{OUT_DIR}/cv_fold_results.csv", index=False)
+    cv_summary.to_csv(OUTPUT_DIR / "cv_summary.csv")
+    cv_results.to_csv(OUTPUT_DIR / "cv_fold_results.csv", index=False)
 
     # --- 2. Threshold and alpha selection on the TRAINING partition only --
     # Out-of-fold XGBoost probabilities avoid selecting a threshold that
@@ -164,7 +166,7 @@ def main():
     best_alpha = max(alpha_thresholds, key=lambda a: alpha_thresholds[a][1])
     t_hybrid = alpha_thresholds[best_alpha][0]
 
-    with open(f"{OUT_DIR}/selected_thresholds.json", "w") as f:
+    with open(OUTPUT_DIR / "selected_thresholds.json", "w") as f:
         json.dump(
             {
                 "t_rule": t_rule,
@@ -182,7 +184,7 @@ def main():
         random_state=42, scale_pos_weight=POS_WEIGHT, **XGB_PARAMS
     )
     final_model.fit(X_train, y_train)
-    final_model.save_model(f"{OUT_DIR}/../models/xgboost_model.json")
+    final_model.save_model(MODEL_DIR / "xgboost_model.json")
 
     xgb_test_prob = final_model.predict_proba(X_test)[:, 1]
     xgb_test_pred = (xgb_test_prob >= t_xgb).astype(int)
@@ -211,7 +213,7 @@ def main():
     hybrid_rows = {k: v for k, v in results.items() if k.startswith("hybrid_alpha")}
     best_alpha_key = f"hybrid_alpha_{best_alpha}"
 
-    with open(f"{OUT_DIR}/best_alpha.json", "w") as f:
+    with open(OUTPUT_DIR / "best_alpha.json", "w") as f:
         json.dump({"best_alpha": best_alpha, "metrics": hybrid_rows[best_alpha_key]}, f, indent=2)
 
     # --- 5. Confusion matrices --------------------------------------------
@@ -230,21 +232,21 @@ def main():
         cm = confusion_matrix(y_test, pred)
         cms[name] = cm.tolist()
 
-    with open(f"{OUT_DIR}/confusion_matrices.json", "w") as f:
+    with open(OUTPUT_DIR / "confusion_matrices.json", "w") as f:
         json.dump(cms, f, indent=2)
 
     # --- 6. Feature importance and SHAP -----------------------------------
     importance = pd.Series(
         final_model.feature_importances_, index=FEATURE_COLS
     ).sort_values(ascending=False)
-    importance.to_csv(f"{OUT_DIR}/xgb_feature_importance.csv")
+    importance.to_csv(OUTPUT_DIR / "xgb_feature_importance.csv")
 
     explainer = shap.TreeExplainer(final_model)
     shap_values = explainer.shap_values(X_test)
     mean_abs_shap = pd.Series(
         np.abs(shap_values).mean(axis=0), index=FEATURE_COLS
     ).sort_values(ascending=False)
-    mean_abs_shap.to_csv(f"{OUT_DIR}/shap_mean_abs.csv")
+    mean_abs_shap.to_csv(OUTPUT_DIR / "shap_mean_abs.csv")
 
     # --- Figures ------------------------------------------------------------
     # ROC curves
@@ -263,7 +265,7 @@ def main():
     plt.title("ROC Curves on Untouched Test Partition")
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"{OUT_DIR}/roc_curves.png", dpi=150)
+    plt.savefig(OUTPUT_DIR / "roc_curves.png", dpi=150)
     plt.close()
 
     # Confusion matrix heatmaps
@@ -282,7 +284,7 @@ def main():
         ax.set_ylabel("Actual")
         ax.set_title(name)
     plt.tight_layout()
-    plt.savefig(f"{OUT_DIR}/confusion_matrices.png", dpi=150)
+    plt.savefig(OUTPUT_DIR / "confusion_matrices.png", dpi=150)
     plt.close()
 
     # Feature importance bar chart
@@ -290,14 +292,14 @@ def main():
     importance.sort_values().plot(kind="barh")
     plt.title("XGBoost Feature Importance")
     plt.tight_layout()
-    plt.savefig(f"{OUT_DIR}/feature_importance.png", dpi=150)
+    plt.savefig(OUTPUT_DIR / "feature_importance.png", dpi=150)
     plt.close()
 
     # SHAP summary plot
     plt.figure()
     shap.summary_plot(shap_values, X_test, feature_names=FEATURE_COLS, show=False)
     plt.tight_layout()
-    plt.savefig(f"{OUT_DIR}/shap_summary.png", dpi=150)
+    plt.savefig(OUTPUT_DIR / "shap_summary.png", dpi=150)
     plt.close()
 
     print("=== CV summary (mean, std across 3 seeds x 5 folds) ===")
