@@ -6,7 +6,7 @@ XGBoost classifier + hybrid combination) over a REST endpoint, per
 Chapter 3, Section 3.4 (Instrument for Data Collection and Development
 Tools).
 
-POST /score/features accepts an SME's six engineered study features
+POST /score/features accepts an SME's eight engineered features
 and returns:
   - the rule-based score and which rules fired
   - the XGBoost probability of the elevated-risk class

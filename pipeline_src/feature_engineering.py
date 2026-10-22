@@ -1,8 +1,8 @@
 """
 Feature-engineering module.
 
-Converts the raw transaction log (one row per transaction) into the six
-study features defined in Chapter 3, Table 3.1:
+Converts the raw transaction log (one row per transaction) into the eight
+indicators (six conceptual dimensions) defined in Chapter 3, Table 3.4:
   1. transaction_frequency
   2. transaction_volume        (total_volume, avg_transaction_value)
   3. volatility
@@ -10,7 +10,7 @@ study features defined in Chapter 3, Table 3.1:
   5. cashflow_net, cashflow_stability
   6. growth_trend
 
-One row is produced per SME. Operational definitions match Table 3.1 and
+One row is produced per SME. Operational definitions match Table 3.4 and
 are fixed here before any model is trained (Section 3.5 / 3.7).
 """
 

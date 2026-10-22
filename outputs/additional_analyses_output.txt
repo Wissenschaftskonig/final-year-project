@@ -1,40 +1,40 @@
 majority baseline acc 0.901 n elevated 99
 --- Table 4.6 (bootstrap 95% CI)
 rule 0.408(0.327-0.500) 0.495(0.398-0.596) 0.447(0.368-0.528) 0.783(0.729-0.834)
-xgb 0.405(0.330-0.487) 0.606(0.510-0.702) 0.486(0.408-0.560) 0.865(0.829-0.899)
-hyb 0.399(0.321-0.481) 0.576(0.480-0.673) 0.471(0.392-0.549) 0.844(0.801-0.885)
-hyb-xgb dF1 -0.015 (-0.057,0.025)  dAUC -0.021 (-0.039,-0.004)
-McNemar hyb vs xgb (16, 17, 1.0)
-McNemar xgb vs rule (42, 48, np.float64(0.5984117182335192))
-McNemar hyb vs rule (25, 32, np.float64(0.42704285650325524))
-DeLong hyb - xgb (np.float64(-0.021143734795233238), np.float64(0.018583197086890706))
-DeLong xgb - rule (np.float64(0.08254576845031902), np.float64(2.076775836198737e-05))
-DeLong hyb - rule (np.float64(0.061402033655085786), np.float64(3.915493223859874e-07))
-disagree 90 elev among 21 0.233 | bothlow 821 elev rate 0.041 base 0.099
-hybrid FN 42 of which disagree 8
-review rule flagged 179 TP 65 recall 0.657 prec 0.363 hyb flagged 143
-corr freq-volume (full data) 0.7546869990692293  train: 0.7546183573902774
---- CV AUC: rule 0.806(0.023) xgb 0.834(0.022) hyb 0.838(0.025); hyb<xgb in 6 folds
+xgb 0.432(0.350-0.521) 0.545(0.447-0.644) 0.482(0.400-0.561) 0.858(0.819-0.894)
+hyb 0.440(0.358-0.529) 0.556(0.457-0.653) 0.491(0.409-0.570) 0.841(0.797-0.883)
+hyb-xgb dF1 0.009 (-0.036,0.056)  dAUC -0.017 (-0.036,0.001)
+McNemar hyb vs xgb (20, 18, np.float64(0.8714146793645341))
+McNemar xgb vs rule (44, 39, np.float64(0.6608836477612154))
+McNemar hyb vs rule (26, 19, np.float64(0.3712980344710104))
+DeLong hyb - xgb (np.float64(-0.01718629132613614), np.float64(0.06963548886077847))
+DeLong xgb - rule (np.float64(0.07520263680086126), np.float64(0.00013010855803216356))
+DeLong hyb - rule (np.float64(0.05801634547472512), np.float64(7.685957962178474e-07))
+disagree 83 elev among 19 0.229 | bothlow 836 elev rate 0.045 base 0.099
+hybrid FN 44 of which disagree 6
+review rule flagged 164 TP 61 recall 0.616 prec 0.372 hyb flagged 125
+corr freq-volume (full data) 0.7546869990692294  train: 0.7546183573902776
+--- CV AUC: rule 0.806(0.023) xgb 0.835(0.023) hyb 0.838(0.026); hyb<xgb in 5 folds
 --- Table 4.8 ablation
-Transaction frequency: 0.835 (0.024) change +0.001
-Total transaction volume: 0.832 (0.024) change -0.001
-Average transaction value: 0.833 (0.025) change -0.000
-Volatility: 0.832 (0.024) change -0.002
-Seasonality: 0.837 (0.025) change +0.004
-Net cash flow: 0.817 (0.024) change -0.017
-Cash-flow stability: 0.822 (0.024) change -0.012
-Growth trend: 0.830 (0.026) change -0.003
-Volume pair: 0.816 (0.023) change -0.017
-Cash-flow pair: 0.762 (0.031) change -0.072
-2877 label 0 rule 0.308 xgb 0.003 hyb 0.155 pred 0 trig high_volatility;declining_trend
+Transaction frequency: 0.836 (0.024) change +0.001
+Total transaction volume: 0.833 (0.023) change -0.002
+Average transaction value: 0.833 (0.023) change -0.001
+Volatility: 0.831 (0.023) change -0.003
+Seasonality: 0.836 (0.024) change +0.002
+Net cash flow: 0.817 (0.027) change -0.018
+Cash-flow stability: 0.821 (0.025) change -0.013
+Growth trend: 0.832 (0.025) change -0.002
+Volume pair: 0.817 (0.023) change -0.017
+Cash-flow pair: 0.759 (0.033) change -0.076
+2877 label 0 rule 0.308 xgb 0.002 hyb 0.155 pred 0 trig high_volatility;declining_trend
   freq 59.5 vol 8666481 net -1923349 stab 0.072 vola 0.425 seas 2.195 growth -0.033
-  SHAP cashflow_stability -2.68, transaction_frequency -1.52, total_volume -0.97, growth_trend -0.35, cashflow_net -0.26
+  SHAP cashflow_stability -2.56, transaction_frequency -1.45, total_volume -1.07, growth_trend -0.42, cashflow_net -0.37
   in train? True
-4757 label 1 rule 0.692 xgb 0.983 hyb 0.838 pred 1 trig low_frequency;low_volume;high_volatility;unstable_cashflow
+4757 label 1 rule 0.692 xgb 0.985 hyb 0.839 pred 1 trig low_frequency;low_volume;high_volatility;unstable_cashflow
   freq 17.7 vol 1487361 net -1465257 stab 0.645 vola 0.648 seas 1.488 growth 0.161
-  SHAP cashflow_stability +2.48, total_volume +1.22, growth_trend -1.05, transaction_frequency +0.51, avg_transaction_value +0.46
+  SHAP cashflow_stability +2.38, total_volume +1.35, growth_trend -1.04, transaction_frequency +0.51, avg_transaction_value +0.51
   in train? True
-136 label 1 rule 0.308 xgb 0.821 hyb 0.564 pred 1 trig unstable_cashflow;negative_net_flow
+136 label 1 rule 0.308 xgb 0.799 hyb 0.553 pred 0 trig unstable_cashflow;negative_net_flow
   freq 44.7 vol 15722318 net -15349027 stab 0.344 vola 0.350 seas 1.525 growth 0.056
-  SHAP total_volume -0.92, cashflow_net +0.90, cashflow_stability +0.79, avg_transaction_value +0.40, transaction_frequency -0.33
+  SHAP total_volume -0.92, cashflow_stability +0.81, cashflow_net +0.81, avg_transaction_value +0.43, seasonality +0.39
   in train? True

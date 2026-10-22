@@ -28,7 +28,7 @@ generated data. They do not show predictive performance on live Nigerian lending
 
 ## Setup
 
-Tested environment: Python 3.12.15, macOS 26.5.2, Apple M4, 16 GB RAM.
+Tested environments: Linux x86_64 (Ubuntu 24.04, Python 3.12.3), which reproduces the reported results exactly; macOS 26.5.2 on Apple M4 with 16 GB RAM (Python 3.12.15).
 
 Exact dependency versions (pinned in `requirements.txt`):
 
@@ -62,8 +62,11 @@ analyses. The `data/` folder is created and filled on first run (about 2.3 milli
 committed because the fixed seeds regenerate it exactly.
 
 Seeds: 42 for data generation, the train/test split and the final model; 1, 2 and 3 for cross-validation; 2026 for the
-bootstrap. XGBoost settings are fixed in `train_evaluate.py` (`XGB_PARAMS`, `POS_WEIGHT = 9.14`). Small differences in
-the last decimal place can occur on other library versions or hardware.
+bootstrap. XGBoost settings are fixed in `train_evaluate.py` (`XGB_PARAMS`, `POS_WEIGHT = 9.14`). The results in `outputs/`
+and in the thesis were produced on Linux (x86_64), where `verify_reproduction.py` passes all 67 checks. XGBoost does not
+guarantee identical training results across platforms: on macOS (Apple M4) the data, features and rule-based results are
+identical, but the XGBoost and hybrid results differ (thesis Appendix A, Table A.4). To reproduce the reported numbers
+exactly, run the pipeline on Linux, for example in a Docker container or GitHub Codespaces.
 
 ## Main results (untouched test set, 1,000 SMEs, 99 elevated risk)
 

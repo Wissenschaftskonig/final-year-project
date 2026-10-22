@@ -1,9 +1,9 @@
 ,0
-cashflow_stability,0.3186163
-total_volume,0.15760615
-transaction_frequency,0.11787231
-cashflow_net,0.10147276
-growth_trend,0.08224295
-avg_transaction_value,0.08004935
-volatility,0.074941985
-seasonality,0.06719819
+cashflow_stability,0.2798194
+total_volume,0.19204633
+transaction_frequency,0.111521624
+cashflow_net,0.10904208
+volatility,0.0846741
+growth_trend,0.07694135
+avg_transaction_value,0.076539725
+seasonality,0.06941542

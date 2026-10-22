@@ -2,7 +2,7 @@
 """
 Verification script for reproducing the thesis results.
 
-Checks all expected values from Section 3 of the agent instructions.
+Checks the generated outputs against the values reported in Chapter Four of the thesis.
 """
 
 import json
